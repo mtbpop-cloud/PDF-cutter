@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF下部カッター | 自動PDF編集ツール</title>
+    <meta name="description" content="PDFの各ページ下部を自動で削除するオンラインツール。サーバーへのアップロード不要、完全にブラウザ上で処理。">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <main class="container">
+        <header class="hero">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+            </div>
+            <h1>PDF下部カッター</h1>
+            <p class="subtitle">各ページの下部を自動で削除</p>
+            <div class="badge">
+                <span class="badge-dot"></span>
+                完全ローカル処理 - データはサーバーに送信されません
+            </div>
+        </header>
+
+        <section class="upload-section" id="uploadSection">
+            <div class="upload-area" id="dropZone">
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h2>PDFファイルをドロップ</h2>
+                    <p>または <label for="fileInput" class="file-label">ファイルを選択</label></p>
+                    <input type="file" id="fileInput" accept=".pdf" hidden>
+                </div>
+                <div class="upload-hover-effect"></div>
+            </div>
+        </section>
+
+        <section class="settings-section" id="settingsSection" hidden>
+            <div class="glass-card settings-card">
+                <div class="file-info">
+                    <div class="file-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <h3 id="fileName">sample.pdf</h3>
+                        <p id="fileSize">2.5 MB</p>
+                    </div>
+                    <button class="change-file-btn" id="changeFileBtn">変更</button>
+                </div>
+
+                <div class="crop-settings">
+                    <label class="settings-label">
+                        <span>下部カット率</span>
+                        <span class="crop-value" id="cropValueDisplay">15%</span>
+                    </label>
+                    <div class="slider-container">
+                        <input type="range" id="cropSlider" min="1" max="50" value="15" class="crop-slider">
+                        <div class="slider-labels">
+                            <span>1%</span>
+                            <span>50%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-container">
+                    <div class="preview-header">
+                        <h3>プレビュー</h3>
+                        <div class="page-nav">
+                            <button class="nav-btn" id="prevPageBtn" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                            </button>
+                            <span id="pageIndicator">1 / 1</span>
+                            <button class="nav-btn" id="nextPageBtn" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="preview-wrapper">
+                        <div class="preview-frame" id="previewFrame">
+                            <canvas id="previewCanvas"></canvas>
+                            <div class="crop-overlay" id="cropOverlay">
+                                <div class="drag-handle" id="dragHandle">
+                                    <div class="drag-handle-line"></div>
+                                    <div class="drag-handle-grip"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="process-btn" id="processBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    処理を実行
+                </button>
+            </div>
+        </section>
+
+        <section class="progress-section" id="progressSection" hidden>
+            <div class="glass-card">
+                <div class="file-info">
+                    <div class="file-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <h3 id="progressFileName">sample.pdf</h3>
+                        <p id="progressFileSize">2.5 MB</p>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressStatus">処理中...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="result-section" id="resultSection" hidden>
+            <div class="glass-card result-card">
+                <div class="result-icon success">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h2>処理完了！</h2>
+                <div class="result-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="pageCount">0</span>
+                        <span class="stat-label">ページ処理</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="cropPercent">15%</span>
+                        <span class="stat-label">下部削除</span>
+                    </div>
+                </div>
+
+                <div class="result-preview">
+                    <h3>処理後プレビュー</h3>
+                    <div class="result-page-nav">
+                        <button class="nav-btn" id="resultPrevBtn" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <span id="resultPageIndicator">1 / 1</span>
+                        <button class="nav-btn" id="resultNextBtn" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="result-preview-frame">
+                        <canvas id="resultCanvas"></canvas>
+                    </div>
+                </div>
+
+                <button class="download-btn" id="downloadBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    PDFをダウンロード
+                </button>
+                <button class="reset-btn" id="resetBtn">別のファイルを処理</button>
+            </div>
+        </section>
+
+        <section class="error-section" id="errorSection" hidden>
+            <div class="glass-card error-card">
+                <div class="result-icon error">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <h2>エラーが発生しました</h2>
+                <p id="errorMessage">ファイルの処理中にエラーが発生しました。</p>
+                <button class="reset-btn" id="errorResetBtn">再試行</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 PDF下部カッター - ブラウザ上で完全に動作</p>
+    </footer>
+
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <script src="app.js"></script>
+</body>
+
+</html>
