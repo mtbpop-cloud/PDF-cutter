@@ -4,11 +4,12 @@ PDFの各ページ下部を自動削除するWebアプリケーション
 
 <div align="center">
 
-**[🚀 デモを見る](https://orbital-zodiac.vercel.app)**
+**[🚀 デモを見る](https://pdf-cutter.pages.dev)**
 
 ![PDF Bottom Cropper](https://img.shields.io/badge/PDF-Editor-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Made with](https://img.shields.io/badge/made%20with-Vanilla%20JS-yellow)
+![Hosted on](https://img.shields.io/badge/hosted%20on-Cloudflare%20Pages-orange)
 
 </div>
 
@@ -61,10 +62,10 @@ PDFの各ページ下部を自動削除するWebアプリケーション
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/yourusername/orbital-zodiac.git
+git clone https://github.com/mtbpop-cloud/PDF-cutter.git
 
 # ディレクトリに移動
-cd orbital-zodiac
+cd PDF-cutter
 
 # ローカルサーバーで実行（例：Python）
 python -m http.server 8000
@@ -77,9 +78,9 @@ open http://localhost:8000
 
 ## 🌐 デプロイ
 
-このプロジェクトはVercelで簡単にデプロイできます：
+このプロジェクトはCloudflare Pagesでデプロイされています。
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/orbital-zodiac)
+詳細な手順は [DEPLOYMENT.md](DEPLOYMENT.md) を参照してください。
 
 ---
 

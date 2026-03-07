@@ -35,5 +35,5 @@ coverage/
 *.temp
 .cache/
 
-# Vercel
-.vercel
+# Cloudflare
+.wrangler
