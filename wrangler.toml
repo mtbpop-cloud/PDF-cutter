@@ -1,0 +1,2 @@
+name = "pdf-cutter"
+pages_build_output_dir = "."
