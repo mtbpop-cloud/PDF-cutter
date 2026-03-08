@@ -132,13 +132,22 @@ function getImageMimeType(file) {
 // Initialize
 // ===================================
 function init() {
-    // Drag and drop
+    // Prevent browser from opening files in new tab on drag/drop anywhere
+    document.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
+    document.addEventListener('drop', (e) => { e.preventDefault(); e.stopPropagation(); });
+
+    // Drag and drop on upload zone
     dropZone.addEventListener('dragover', handleDragOver);
     dropZone.addEventListener('dragleave', handleDragLeave);
     dropZone.addEventListener('drop', handleDrop);
     dropZone.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', handleFileSelect);
     dropZone.addEventListener('mousemove', handleMouseMove);
+
+    // Drag and drop on settings section (for adding more files while in settings)
+    settingsSection.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); settingsSection.classList.add('drag-over'); });
+    settingsSection.addEventListener('dragleave', (e) => { e.preventDefault(); e.stopPropagation(); settingsSection.classList.remove('drag-over'); });
+    settingsSection.addEventListener('drop', handleSettingsDrop);
 
     // Settings
     changeFileBtn.addEventListener('click', resetApp);
@@ -148,8 +157,12 @@ function init() {
     nextPageBtn.addEventListener('click', () => navigatePage(1));
     processBtn.addEventListener('click', processFiles);
 
-    // Image gallery add
-    addImageBtn.addEventListener('click', () => addImageInput.click());
+    // Image gallery add - prevent click from propagating
+    addImageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        addImageInput.click();
+    });
+    addImageInput.addEventListener('click', (e) => e.stopPropagation());
     addImageInput.addEventListener('change', handleAddImages);
 
     // Direction buttons
@@ -201,6 +214,27 @@ function handleDrop(e) {
     dropZone.classList.remove('drag-over');
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) loadFiles(files);
+}
+
+async function handleSettingsDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    settingsSection.classList.remove('drag-over');
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length === 0) return;
+
+    if (mode === 'image') {
+        // Add dropped images to gallery
+        const newImages = files.filter(f => isImage(f));
+        for (const file of newImages) {
+            const dataUrl = await readFileAsDataUrl(file);
+            const img = await loadImage(dataUrl);
+            imageFiles.push({ file, dataUrl, img });
+        }
+        renderGallery();
+        renderPreview();
+        updateCropOverlay();
+    }
 }
 
 function handleFileSelect(e) {
