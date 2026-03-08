@@ -133,6 +133,7 @@ function getImageMimeType(file) {
 // ===================================
 const promptCopyBtn = document.getElementById('promptCopyBtn');
 const geminiPromptCopyBtn = document.getElementById('geminiPromptCopyBtn');
+const geminiIconPromptCopyBtn = document.getElementById('geminiIconPromptCopyBtn');
 const toastNotification = document.getElementById('toastNotification');
 
 const NOTEBOOK_LM_PROMPT = `system_instructions:
@@ -170,6 +171,38 @@ system_instructions:
     - "下部11%の白い余白エリアには、背景色以外のいかなる要素（画像の一部、装飾、テキスト、テクスチャなど）も配置してはならない。"
     - "画像全体のアスペクト比を維持したまま、要素の配置とサイズのみを調整する。"`;
 
+const GEMINI_ICON_PROMPT = `レイアウトや出力する画像は以下の指示に従ってください。
+
+# Nanobanana Pro用 レイアウトとロゴ回避のための厳格な制約プロンプト（ピクセル情報なし）
+
+system_instructions:
+  objective: "提供された情報に基づき、高画質でバランスの取れた画像を生成する。特定のレイアウト比率を遵守し、将来のシステムウォーターマークの被りを回避する。"
+
+  # 出力画像の比率設定
+  ratios:
+    aspect_ratio: "1:1（完全な正方形、またはそれに近い比率）"
+
+  # レイアウトとデザインの厳格な制約
+  layout_constraints:
+    # 余白とセーフエリアの設定
+    safe_area:
+      bottom_margin: "画像全体の高さの最下部8%を、完全に無地の白い空隙（セーフエリア）として確保する。"
+      purpose: "右下に自動的に配置されるシステムウォーターマーク（ロゴ）とコンテンツが重なるのを防ぐため。"
+
+    # コンテンツエリアの設定
+    content_area:
+      bounds: "最下部8%の余白を除いた、上部の残り91%の領域内に、すべての主要コンテンツ（主題、背景、装飾、テキストなど）を収める。※残り1%は余白とコンテンツの分離のための緩衝材として使用可能だが、厳密には91%にコンテンツを収める指示として解釈する。"
+      internal_format:
+        description: "この上部91%の高さの領域内で、生成されるコンテンツ自体が「完全な正方形」の構図になるようにレイアウトする。"
+        composition: "コンテンツ（scene, subject, details）は、この領域内で正方形のフォーマットを満たすように構成され、美しいレイアウトを構築する。"
+
+  # 厳格な追加ルール
+  strict_rules:
+    - "最下部8%の白いセーフエリアには、背景色以外のいかなる要素（画像の一部、装飾、テキスト、テクスチャなど）も配置してはならない。"
+    - "上部91%の領域内のコンテンツは、視覚的に完全な正方形として認識されるように構図を調整する。"
+    - "生成される画像自体には、ピクセル数、解像度、または注釈テキストや矢印といった情報を一切含めてはならない。"
+    - "出力画像のピクセル解像度は、このプロンプトでは指定せず、システム側の最適な高解像度設定に従う。"`;
+
 function init() {
     // Prevent browser from opening files in new tab on drag/drop anywhere
     document.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
@@ -178,6 +211,7 @@ function init() {
     // Prompt copy buttons
     promptCopyBtn.addEventListener('click', () => copyToClipboard(NOTEBOOK_LM_PROMPT));
     geminiPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_PROMPT));
+    geminiIconPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_ICON_PROMPT));
 
     // Drag and drop on upload zone
     dropZone.addEventListener('dragover', handleDragOver);
