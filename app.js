@@ -12,6 +12,7 @@
 
 // Upload
 const dropZone = document.getElementById('dropZone');
+const pasteZone = document.getElementById('pasteZone');
 const fileInput = document.getElementById('fileInput');
 const uploadSection = document.getElementById('uploadSection');
 
@@ -213,6 +214,16 @@ function init() {
     geminiPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_PROMPT));
     geminiIconPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_ICON_PROMPT));
 
+    // Paste zone
+    pasteZone.addEventListener('click', () => pasteZone.focus());
+    pasteZone.addEventListener('paste', handlePaste);
+    // Also listen for paste on document when paste zone is focused
+    document.addEventListener('paste', (e) => {
+        if (document.activeElement === pasteZone || !settingsSection.hidden === false) {
+            handlePaste(e);
+        }
+    });
+
     // Drag and drop on upload zone
     dropZone.addEventListener('dragover', handleDragOver);
     dropZone.addEventListener('dragleave', handleDragLeave);
@@ -268,6 +279,41 @@ function init() {
     downloadBtn.addEventListener('click', handleDownload);
     resetBtn.addEventListener('click', resetApp);
     errorResetBtn.addEventListener('click', resetApp);
+}
+
+// ===================================
+// Paste Handler
+// ===================================
+function handlePaste(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const clipboardData = e.clipboardData || window.clipboardData;
+    if (!clipboardData) return;
+
+    const items = clipboardData.items;
+    const imageFiles = [];
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type.startsWith('image/')) {
+            const blob = item.getAsFile();
+            if (blob) {
+                // Create a proper File from the blob with a name
+                const ext = item.type.split('/')[1] || 'png';
+                const fileName = `pasted_image_${Date.now()}.${ext}`;
+                const file = new File([blob], fileName, { type: item.type });
+                imageFiles.push(file);
+            }
+        }
+    }
+
+    if (imageFiles.length > 0) {
+        // Visual feedback
+        pasteZone.classList.add('paste-active');
+        setTimeout(() => pasteZone.classList.remove('paste-active'), 500);
+        loadFiles(imageFiles);
+    }
 }
 
 // ===================================
