@@ -220,6 +220,84 @@ body {
 }
 
 /* ===================================
+   Prompt Copy Button
+   =================================== */
+.prompt-copy-section {
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+.prompt-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 100px;
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    backdrop-filter: blur(10px);
+}
+
+.prompt-copy-btn:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+}
+
+.prompt-copy-btn:active {
+    transform: translateY(0);
+}
+
+.prompt-copy-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.prompt-copy-desc {
+    margin-top: 0.625rem;
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+    line-height: 1.5;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ===================================
+   Toast Notification
+   =================================== */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    padding: 0.75rem 1.5rem;
+    background: rgba(16, 185, 129, 0.95);
+    color: white;
+    border-radius: 100px;
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* ===================================
    Upload Section
    =================================== */
 .upload-section {

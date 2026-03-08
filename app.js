@@ -131,10 +131,29 @@ function getImageMimeType(file) {
 // ===================================
 // Initialize
 // ===================================
+const promptCopyBtn = document.getElementById('promptCopyBtn');
+const toastNotification = document.getElementById('toastNotification');
+
+const NOTEBOOK_LM_PROMPT = `system_instructions:
+  objective: "提供された情報に基づき、視覚的に分かりやすいスライド資料を生成する"
+  layout_and_design_constraints:
+    margin_settings:
+      bottom_margin: "スライド全体の高さの下部5%を完全に無地の白い余白（セーフエリア）として確保する"
+      purpose: "右下に出力されるNotebookLMのウォーターマーク（ロゴ）とスライドのコンテンツが重なるのを防ぐため"
+    content_area:
+      usage: "下部5%の余白を除いた、上部の残り95%の領域内にすべてのコンテンツ（テキスト、図形、画像、装飾など）を収める"
+      layout_balance: "95%の領域内で、テキストの視認性や要素の配置バランスが崩れないように、余白や文字サイズを自動調整して美しいレイアウトを構築する"
+    strict_rules:
+      - "下部5%の白い余白エリアには、背景色以外のいかなる要素も配置してはならない"
+      - "スライドの縦横比（アスペクト比）は変更せず、指定された比率を維持したまま要素の配置のみを調整する"`;
+
 function init() {
     // Prevent browser from opening files in new tab on drag/drop anywhere
     document.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
     document.addEventListener('drop', (e) => { e.preventDefault(); e.stopPropagation(); });
+
+    // Prompt copy button
+    promptCopyBtn.addEventListener('click', handlePromptCopy);
 
     // Drag and drop on upload zone
     dropZone.addEventListener('dragover', handleDragOver);
@@ -191,6 +210,34 @@ function init() {
     downloadBtn.addEventListener('click', handleDownload);
     resetBtn.addEventListener('click', resetApp);
     errorResetBtn.addEventListener('click', resetApp);
+}
+
+// ===================================
+// Prompt Copy
+// ===================================
+async function handlePromptCopy() {
+    try {
+        await navigator.clipboard.writeText(NOTEBOOK_LM_PROMPT);
+        showToast();
+    } catch (err) {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = NOTEBOOK_LM_PROMPT;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast();
+    }
+}
+
+function showToast() {
+    toastNotification.classList.add('show');
+    setTimeout(() => {
+        toastNotification.classList.remove('show');
+    }, 2000);
 }
 
 // ===================================
