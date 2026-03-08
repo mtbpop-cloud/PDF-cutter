@@ -402,18 +402,28 @@ function handleMouseMove(e) {
 }
 
 async function loadFiles(files) {
-    const firstFile = files[0];
+    try {
+        const firstFile = files[0];
 
-    if (isPDF(firstFile)) {
-        mode = 'pdf';
-        await loadPDFFile(firstFile);
-    } else if (isImage(firstFile)) {
-        mode = 'image';
-        const imageFilesOnly = files.filter(f => isImage(f));
-        await loadImageFiles(imageFilesOnly);
-    } else {
-        showError('対応していないファイル形式です。PDF・PNG・JPEG・WebP・GIF・BMPに対応しています。');
-        return;
+        if (isPDF(firstFile)) {
+            mode = 'pdf';
+            await loadPDFFile(firstFile);
+        } else if (isImage(firstFile)) {
+            mode = 'image';
+            const imageFilesOnly = files.filter(f => isImage(f));
+            if (imageFilesOnly.length === 0) {
+                showError('有効な画像ファイルが見つかりませんでした。');
+                return;
+            }
+            await loadImageFiles(imageFilesOnly);
+        } else {
+            showError('対応していないファイル形式です。PDF・PNG・JPEG・WebP・GIF・BMPに対応しています。');
+            return;
+        }
+    } catch (error) {
+        console.error('File loading error:', error);
+        showError('ファイルの読み込み中にエラーが発生しました。有効なファイルであることを確認してください。');
+        resetApp();
     }
 }
 
