@@ -1,12 +1,12 @@
-# PDF下部カッター | PDF Bottom Cropper
+# ロゴカッター | Logo Cutter
 
-PDFの各ページ下部を自動削除するWebアプリケーション
+PDF・画像ファイルの上部/下部を自動で一括カットするWebアプリケーション
 
 <div align="center">
 
 **[🚀 デモを見る](https://pdf-cutter.pages.dev)**
 
-![PDF Bottom Cropper](https://img.shields.io/badge/PDF-Editor-blue)
+![Logo Cutter](https://img.shields.io/badge/Logo-Cutter-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Made with](https://img.shields.io/badge/made%20with-Vanilla%20JS-yellow)
 ![Hosted on](https://img.shields.io/badge/hosted%20on-Cloudflare%20Pages-orange)
@@ -20,80 +20,41 @@ PDFの各ページ下部を自動削除するWebアプリケーション
 | 機能 | 説明 |
 |------|------|
 | 📂 **ドラッグ&ドロップ** | ファイルをドロップするだけで簡単アップロード |
-| 🔍 **リアルタイムプレビュー** | 処理前のPDFをページごとに確認 |
-| 🎯 **ドラッグ調整** | オーバーレイ境界をドラッグしてカット幅を直感的に設定 |
+| 🖼️ **画像対応** | PNG・JPEG・WebP・GIF・BMP をサポート |
+| 📄 **PDF対応** | PDFの各ページをカット処理 |
+| 🔄 **一括処理** | 複数画像をまとめてカット |
+| ↕️ **上下カット** | 上部・下部の切り替えに対応 |
 | 📊 **カット率スライダー** | 1%〜50%で細かく調整可能 |
-| ✂️ **ビジュアル表示** | 削除される領域を赤色で可視化 |
-| 👁️ **処理後プレビュー** | ダウンロード前に結果を確認 |
+| 🎯 **ドラッグ調整** | オーバーレイ境界をドラッグして直感的に設定 |
+| 📁 **出力変換** | 同フォーマット・PDF・PNG の出力に対応 |
+| 📦 **ZIP出力** | 複数ファイルはZIPで一括ダウンロード |
 | 🔒 **プライバシー保護** | 完全クライアントサイド処理 |
 
 ---
 
 ## 🚀 使い方
 
-1. **PDFをアップロード**
-   - ファイルをドロップまたは選択
-
-2. **カット幅を調整**
-   - スライダーを動かす、または
-   - オーバーレイ境界をドラッグ
-
-3. **プレビューで確認**
-   - ページナビゲーションで全ページをチェック
-
-4. **処理を実行**
-   - 「処理を実行」ボタンをクリック
-
-5. **ダウンロード**
-   - 処理後プレビューを確認して「PDFをダウンロード」
+1. **ファイルをアップロード** - PDF or 画像をドロップまたは選択
+2. **カット方向を選択** - 上部 or 下部（デフォルト: 下部）
+3. **カット幅を調整** - スライダーまたはドラッグで設定
+4. **出力フォーマットを選択** - 元のフォーマット / PDF / PNG
+5. **処理を実行 → ダウンロード**
 
 ---
 
 ## 🛠️ 技術スタック
 
-- **PDF処理**: [pdf-lib](https://pdf-lib.js.org/) - PDF直接編集
-- **PDFレンダリング**: [PDF.js](https://mozilla.github.io/pdf.js/) - プレビュー表示
+- **PDF処理**: [pdf-lib](https://pdf-lib.js.org/) - PDF編集・画像→PDF変換
+- **PDFレンダリング**: [PDF.js](https://mozilla.github.io/pdf.js/) - プレビュー・PDF→PNG変換
+- **画像処理**: Canvas API（ネイティブ）
+- **ZIP生成**: [JSZip](https://stuk.github.io/jszip/) - 複数ファイルZIP化
 - **スタイリング**: Vanilla CSS (グラスモーフィズム、グラデーション)
-- **JavaScript**: ES6+ (完全クライアントサイド)
-
----
-
-## 📦 ローカルでの実行
-
-```bash
-# リポジトリをクローン
-git clone https://github.com/mtbpop-cloud/PDF-cutter.git
-
-# ディレクトリに移動
-cd PDF-cutter
-
-# ローカルサーバーで実行（例：Python）
-python -m http.server 8000
-
-# ブラウザで開く
-open http://localhost:8000
-```
-
----
-
-## 🌐 デプロイ
-
-このプロジェクトはCloudflare Pagesでデプロイされています。
-
-詳細な手順は [DEPLOYMENT.md](DEPLOYMENT.md) を参照してください。
 
 ---
 
 ## 📝 ライセンス
 
-MIT License - 自由に使用・改変・配布できます
-
----
-
-## 🙏 謝辞
-
-- [pdf-lib](https://pdf-lib.js.org/) - Andrew Dillon氏
-- [PDF.js](https://mozilla.github.io/pdf.js/) - Mozilla
+MIT License
 
 ---
 

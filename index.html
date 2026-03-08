@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF下部カッター | 自動PDF編集ツール</title>
-    <meta name="description" content="PDFの各ページ下部を自動で削除するオンラインツール。サーバーへのアップロード不要、完全にブラウザ上で処理。">
+    <title>ロゴカッター | PDF・画像ファイル一括編集ツール</title>
+    <meta name="description" content="PDF・画像ファイルの上部/下部を自動で一括カット。サーバーへのアップロード不要、完全にブラウザ上で処理。">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,19 +26,20 @@
             <div class="logo">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
                 </svg>
             </div>
-            <h1>PDF下部カッター</h1>
-            <p class="subtitle">各ページの下部を自動で削除</p>
+            <h1>ロゴカッター</h1>
+            <p class="subtitle">PDF・画像ファイルの上部/下部を一括カット</p>
             <div class="badge">
                 <span class="badge-dot"></span>
                 完全ローカル処理 - データはサーバーに送信されません
             </div>
         </header>
 
+        <!-- Upload Section -->
         <section class="upload-section" id="uploadSection">
             <div class="upload-area" id="dropZone">
                 <div class="upload-content">
@@ -50,17 +51,21 @@
                             <line x1="12" y1="3" x2="12" y2="15"></line>
                         </svg>
                     </div>
-                    <h2>PDFファイルをドロップ</h2>
+                    <h2>ファイルをドロップ</h2>
+                    <p>PDF・PNG・JPEG・WebP・GIF・BMP 対応</p>
                     <p>または <label for="fileInput" class="file-label">ファイルを選択</label></p>
-                    <input type="file" id="fileInput" accept=".pdf" hidden>
+                    <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp" multiple hidden>
                 </div>
                 <div class="upload-hover-effect"></div>
             </div>
         </section>
 
+        <!-- Settings Section -->
         <section class="settings-section" id="settingsSection" hidden>
             <div class="glass-card settings-card">
-                <div class="file-info">
+
+                <!-- File Info (PDF mode) -->
+                <div class="file-info" id="fileInfoSingle">
                     <div class="file-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -75,9 +80,36 @@
                     <button class="change-file-btn" id="changeFileBtn">変更</button>
                 </div>
 
+                <!-- Image Gallery (Image mode) -->
+                <div class="image-gallery" id="imageGallery" hidden>
+                    <div class="gallery-header">
+                        <h3>アップロード画像 <span class="image-count" id="imageCount">0枚</span></h3>
+                        <button class="change-file-btn" id="galleryResetBtn">リセット</button>
+                    </div>
+                    <div class="gallery-grid" id="galleryGrid"></div>
+                    <div class="gallery-add" id="addImageBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>画像を追加</span>
+                        <input type="file" id="addImageInput" accept=".png,.jpg,.jpeg,.webp,.gif,.bmp" multiple hidden>
+                    </div>
+                </div>
+
+                <!-- Crop Direction -->
+                <div class="crop-direction">
+                    <label class="settings-label"><span>カット方向</span></label>
+                    <div class="direction-selector">
+                        <button class="dir-btn active" data-dir="bottom" id="dirBottom">下部カット</button>
+                        <button class="dir-btn" data-dir="top" id="dirTop">上部カット</button>
+                    </div>
+                </div>
+
+                <!-- Crop Settings -->
                 <div class="crop-settings">
                     <label class="settings-label">
-                        <span>下部カット率</span>
+                        <span>カット率</span>
                         <span class="crop-value" id="cropValueDisplay">15%</span>
                     </label>
                     <div class="slider-container">
@@ -89,10 +121,11 @@
                     </div>
                 </div>
 
+                <!-- Preview Container -->
                 <div class="preview-container">
                     <div class="preview-header">
                         <h3>プレビュー</h3>
-                        <div class="page-nav">
+                        <div class="page-nav" id="pageNav">
                             <button class="nav-btn" id="prevPageBtn" disabled>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="15 18 9 12 15 6"></polyline>
@@ -119,6 +152,17 @@
                     </div>
                 </div>
 
+                <!-- Output Format -->
+                <div class="output-format-section">
+                    <label class="settings-label"><span>出力フォーマット</span></label>
+                    <div class="output-format-selector" id="outputFormatSelector">
+                        <button class="format-btn active" data-format="same" id="formatSame">元のフォーマット</button>
+                        <button class="format-btn" data-format="pdf" id="formatPdf">PDF</button>
+                        <button class="format-btn" data-format="png" id="formatPng">PNG</button>
+                    </div>
+                </div>
+
+                <!-- Process Button -->
                 <button class="process-btn" id="processBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
@@ -131,6 +175,7 @@
             </div>
         </section>
 
+        <!-- Progress Section -->
         <section class="progress-section" id="progressSection" hidden>
             <div class="glass-card">
                 <div class="file-info">
@@ -142,8 +187,8 @@
                         </svg>
                     </div>
                     <div class="file-details">
-                        <h3 id="progressFileName">sample.pdf</h3>
-                        <p id="progressFileSize">2.5 MB</p>
+                        <h3 id="progressFileName">処理中...</h3>
+                        <p id="progressFileSize"></p>
                     </div>
                 </div>
                 <div class="progress-container">
@@ -158,6 +203,7 @@
             </div>
         </section>
 
+        <!-- Result Section -->
         <section class="result-section" id="resultSection" hidden>
             <div class="glass-card result-card">
                 <div class="result-icon success">
@@ -169,18 +215,18 @@
                 <h2>処理完了！</h2>
                 <div class="result-stats">
                     <div class="stat">
-                        <span class="stat-value" id="pageCount">0</span>
-                        <span class="stat-label">ページ処理</span>
+                        <span class="stat-value" id="resultFileCount">0</span>
+                        <span class="stat-label">ファイル処理</span>
                     </div>
                     <div class="stat">
-                        <span class="stat-value" id="cropPercent">15%</span>
-                        <span class="stat-label">下部削除</span>
+                        <span class="stat-value" id="resultCropPercent">15%</span>
+                        <span class="stat-label" id="resultCropDirection">下部削除</span>
                     </div>
                 </div>
 
                 <div class="result-preview">
                     <h3>処理後プレビュー</h3>
-                    <div class="result-page-nav">
+                    <div class="result-page-nav" id="resultPageNav">
                         <button class="nav-btn" id="resultPrevBtn" disabled>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="15 18 9 12 15 6"></polyline>
@@ -205,12 +251,13 @@
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                    PDFをダウンロード
+                    ダウンロード
                 </button>
                 <button class="reset-btn" id="resetBtn">別のファイルを処理</button>
             </div>
         </section>
 
+        <!-- Error Section -->
         <section class="error-section" id="errorSection" hidden>
             <div class="glass-card error-card">
                 <div class="result-icon error">
@@ -229,11 +276,12 @@
     </main>
 
     <footer class="footer">
-        <p>© 2026 PDF下部カッター - ブラウザ上で完全に動作</p>
+        <p>© 2026 ロゴカッター - ブラウザ上で完全に動作</p>
     </footer>
 
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
