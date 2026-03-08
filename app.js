@@ -132,6 +132,7 @@ function getImageMimeType(file) {
 // Initialize
 // ===================================
 const promptCopyBtn = document.getElementById('promptCopyBtn');
+const geminiPromptCopyBtn = document.getElementById('geminiPromptCopyBtn');
 const toastNotification = document.getElementById('toastNotification');
 
 const NOTEBOOK_LM_PROMPT = `system_instructions:
@@ -147,13 +148,36 @@ const NOTEBOOK_LM_PROMPT = `system_instructions:
       - "下部5%の白い余白エリアには、背景色以外のいかなる要素も配置してはならない"
       - "スライドの縦横比（アスペクト比）は変更せず、指定された比率を維持したまま要素の配置のみを調整する"`;
 
+const GEMINI_PROMPT = `レイアウトは以下の指示に従ってください。
+# Nanobanana Pro用 レイアウト指定プロンプト
+system_instructions:
+  # 全体目標
+  objective: "提供された情報（または前述または後述されたコンテンツ指示）に基づき、高画質でバランスの取れた画像を生成する。"
+  # アスペクト比の指定（16:9を優先、またはそれに近い比率）
+  aspect_ratio: "16:9（またはそれに近い比率。例：16:10）"
+  # レイアウトとデザインの厳格な制約
+  layout_constraints:
+    # 余白の設定
+    margins:
+      bottom: "画像全体の高さの下部11%を完全に無地の白い余白（セーフエリア）として確保する。"
+      purpose: "右下に自動的に付与される可視ウォーターマーク（ロゴ）とコンテンツが重なるのを防ぐため。"
+    # コンテンツエリアの設定
+    content_area:
+      bounds: "下部11%の余白を除いた、上部の残り89%の領域内に、すべての主要コンテンツ（主題、背景、装飾、テキストなど）を収める。"
+      balance: "89%の領域内で、テキストの視認性や要素の配置バランスが崩れないように、構図、余白、文字サイズ（テキストが存在する場合）を自動調整し、美しいレイアウトを構築する。"
+  # 厳格な追加ルール
+  strict_rules:
+    - "下部11%の白い余白エリアには、背景色以外のいかなる要素（画像の一部、装飾、テキスト、テクスチャなど）も配置してはならない。"
+    - "画像全体のアスペクト比を維持したまま、要素の配置とサイズのみを調整する。"`;
+
 function init() {
     // Prevent browser from opening files in new tab on drag/drop anywhere
     document.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
     document.addEventListener('drop', (e) => { e.preventDefault(); e.stopPropagation(); });
 
-    // Prompt copy button
-    promptCopyBtn.addEventListener('click', handlePromptCopy);
+    // Prompt copy buttons
+    promptCopyBtn.addEventListener('click', () => copyToClipboard(NOTEBOOK_LM_PROMPT));
+    geminiPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_PROMPT));
 
     // Drag and drop on upload zone
     dropZone.addEventListener('dragover', handleDragOver);
@@ -215,14 +239,14 @@ function init() {
 // ===================================
 // Prompt Copy
 // ===================================
-async function handlePromptCopy() {
+async function copyToClipboard(text) {
     try {
-        await navigator.clipboard.writeText(NOTEBOOK_LM_PROMPT);
+        await navigator.clipboard.writeText(text);
         showToast();
     } catch (err) {
         // Fallback for older browsers
         const textarea = document.createElement('textarea');
-        textarea.value = NOTEBOOK_LM_PROMPT;
+        textarea.value = text;
         textarea.style.position = 'fixed';
         textarea.style.opacity = '0';
         document.body.appendChild(textarea);

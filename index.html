@@ -38,17 +38,32 @@
                 完全ローカル処理 - データはサーバーに送信されません
             </div>
 
-            <!-- NotebookLM Prompt Copy Button -->
+            <!-- Prompt Copy Buttons -->
             <div class="prompt-copy-section">
-                <button class="prompt-copy-btn" id="promptCopyBtn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                    NotebookLM用プロンプト
-                </button>
-                <p class="prompt-copy-desc">Studio内の「スライド資料」の右側、鉛筆ボタンをクリック後、コピーしたプロンプトをコピペしてスライドを作成してください</p>
+                <div class="prompt-copy-row">
+                    <div class="prompt-copy-item">
+                        <button class="prompt-copy-btn" id="promptCopyBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            NotebookLM用プロンプト
+                        </button>
+                        <p class="prompt-copy-desc">Studio内の「スライド資料」の右側、鉛筆ボタンをクリック後、コピーしたプロンプトをコピペしてスライドを作成してください</p>
+                    </div>
+                    <div class="prompt-copy-item">
+                        <button class="prompt-copy-btn" id="geminiPromptCopyBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            Gemini用プロンプト(スライドサイズ)
+                        </button>
+                        <p class="prompt-copy-desc">Geminiなどで画像を作成する際のプロンプトを入力した後、コピーしたプロンプトをコピペして画像を作成してください</p>
+                    </div>
+                </div>
             </div>
         </header>
 

@@ -227,6 +227,21 @@ body {
     text-align: center;
 }
 
+.prompt-copy-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.prompt-copy-item {
+    flex: 1;
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .prompt-copy-btn {
     display: inline-flex;
     align-items: center;
@@ -1215,5 +1230,14 @@ body {
     .direction-selector,
     .output-format-selector {
         flex-wrap: wrap;
+    }
+
+    .prompt-copy-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .prompt-copy-item {
+        max-width: 100%;
     }
 }
