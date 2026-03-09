@@ -135,6 +135,7 @@ function getImageMimeType(file) {
 const promptCopyBtn = document.getElementById('promptCopyBtn');
 const geminiPromptCopyBtn = document.getElementById('geminiPromptCopyBtn');
 const geminiIconPromptCopyBtn = document.getElementById('geminiIconPromptCopyBtn');
+const geminiInstaPromptCopyBtn = document.getElementById('geminiInstaPromptCopyBtn');
 const toastNotification = document.getElementById('toastNotification');
 
 const NOTEBOOK_LM_PROMPT = `system_instructions:
@@ -204,6 +205,31 @@ system_instructions:
     - "生成される画像自体には、ピクセル数、解像度、または注釈テキストや矢印といった情報を一切含めてはならない。"
     - "出力画像のピクセル解像度は、このプロンプトでは指定せず、システム側の最適な高解像度設定に従う。"`;
 
+const GEMINI_INSTA_PROMPT = `# Nanobanana Pro用 新・厳格化：下部12%余白＆上部88%フル充填レイアウト
+
+system_instructions:
+  objective: "高画質でバランスの取れた画像を生成する。指定されたアスペクト比を維持し、下部12%の背景延長（セーフエリア）を正確に守りつつ、上部88%の領域には余白なく重要なコンテンツを完全に充填する。"
+  
+  dimensions:
+    aspect_ratio: "1080:1534 (約 1:1.42)" 
+    target_resolution: "幅1080ピクセル × 高さ1534ピクセル相当の比率"
+
+  layout_constraints:
+    safe_area:
+      bounds: "画像全体の高さの【最下部から正確に12%】のみを、背景延長エリア（セーフエリア）とする。12%を超えてセーフエリアを広げることを厳禁とする。"
+      content_rule: "この領域には、背景の自然な延長線上の要素のみを描画する。重要な被写体、テキスト、ロゴは厳禁。また、意図しない余白やフェードアウトを絶対に作らないこと。"
+      purpose: "システムウォーターマーク回避用。12%を超えて広げると上部コンテンツが窮屈になるため厳守。"
+    
+    content_area:
+      bounds: "画像全体の高さの【上部から正確に88%】の領域（1080×1350ピクセルの比率）をコンテンツエリアとする。"
+      fill_rule: "この上部88%の領域内は、主題、背景、各種要素で【隙間なく完全に充填】すること。下部12%の背景延長エリアとの境界線（88%のライン）まで確実に画像を描画し、意図しない余白を絶対に作らないこと。"
+      composition: "上部88%の領域内で、4:5の構図として最も美しく引き立つようにレイアウトする。"
+
+  strict_rules:
+    - "上部の画像エリア（88%）と下部の背景延長エリア（12%）の境界線は水平で、くっきりと明確に分かれていること。"
+    - "すべての重要な被写体、テキスト、ロゴ、および視覚的要素は、上部88%のコンテンツエリア（1080x1350）内に完全に収めること。"
+    - "生成される画像自体には、ピクセル数、寸法、解像度、注釈テキスト、矢印などの解説情報を『一切含めてはならない』。"`;
+
 function init() {
     // Prevent browser from opening files in new tab on drag/drop anywhere
     document.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
@@ -213,14 +239,14 @@ function init() {
     promptCopyBtn.addEventListener('click', () => copyToClipboard(NOTEBOOK_LM_PROMPT));
     geminiPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_PROMPT));
     geminiIconPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_ICON_PROMPT));
-
+    geminiInstaPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_INSTA_PROMPT));
     // Paste zone
     pasteZone.addEventListener('click', () => pasteZone.focus());
     pasteZone.addEventListener('paste', handlePaste);
     // Also listen for paste on document when paste zone is focused or we are in image gallery mode
     document.addEventListener('paste', (e) => {
         if (
-            document.activeElement === pasteZone || 
+            document.activeElement === pasteZone ||
             (mode === 'image' && !settingsSection.hidden) ||
             (!settingsSection.hidden === false)
         ) {
@@ -318,7 +344,7 @@ async function handlePaste(e) {
             pasteZone.classList.add('paste-active');
             setTimeout(() => pasteZone.classList.remove('paste-active'), 500);
             loadFiles(pastedFiles);
-        } 
+        }
         // If we are already in image mode and adding more
         else if (mode === 'image' && !settingsSection.hidden) {
             for (const file of pastedFiles) {

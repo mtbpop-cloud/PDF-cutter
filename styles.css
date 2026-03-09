@@ -236,10 +236,11 @@ body {
     gap: 1rem;
     justify-content: center;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 .prompt-copy-item {
-    flex: 1;
+    flex: 0 0 calc(50% - 0.5rem);
     max-width: 360px;
     display: flex;
     flex-direction: column;
