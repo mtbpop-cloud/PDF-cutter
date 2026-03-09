@@ -217,9 +217,13 @@ function init() {
     // Paste zone
     pasteZone.addEventListener('click', () => pasteZone.focus());
     pasteZone.addEventListener('paste', handlePaste);
-    // Also listen for paste on document when paste zone is focused
+    // Also listen for paste on document when paste zone is focused or we are in image gallery mode
     document.addEventListener('paste', (e) => {
-        if (document.activeElement === pasteZone || !settingsSection.hidden === false) {
+        if (
+            document.activeElement === pasteZone || 
+            (mode === 'image' && !settingsSection.hidden) ||
+            (!settingsSection.hidden === false)
+        ) {
             handlePaste(e);
         }
     });
@@ -284,7 +288,7 @@ function init() {
 // ===================================
 // Paste Handler
 // ===================================
-function handlePaste(e) {
+async function handlePaste(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -292,7 +296,7 @@ function handlePaste(e) {
     if (!clipboardData) return;
 
     const items = clipboardData.items;
-    const imageFiles = [];
+    const pastedFiles = [];
 
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
@@ -301,18 +305,31 @@ function handlePaste(e) {
             if (blob) {
                 // Create a proper File from the blob with a name
                 const ext = item.type.split('/')[1] || 'png';
-                const fileName = `pasted_image_${Date.now()}.${ext}`;
+                const fileName = `pasted_image_${Date.now()}_${i}.${ext}`;
                 const file = new File([blob], fileName, { type: item.type });
-                imageFiles.push(file);
+                pastedFiles.push(file);
             }
         }
     }
 
-    if (imageFiles.length > 0) {
-        // Visual feedback
-        pasteZone.classList.add('paste-active');
-        setTimeout(() => pasteZone.classList.remove('paste-active'), 500);
-        loadFiles(imageFiles);
+    if (pastedFiles.length > 0) {
+        // Visual feedback if pasting on main screen
+        if (!settingsSection.hidden === false) {
+            pasteZone.classList.add('paste-active');
+            setTimeout(() => pasteZone.classList.remove('paste-active'), 500);
+            loadFiles(pastedFiles);
+        } 
+        // If we are already in image mode and adding more
+        else if (mode === 'image' && !settingsSection.hidden) {
+            for (const file of pastedFiles) {
+                const dataUrl = await readFileAsDataUrl(file);
+                const img = await loadImage(dataUrl);
+                imageFiles.push({ file, dataUrl, img });
+            }
+            renderGallery();
+            renderPreview();
+            updateCropOverlay();
+        }
     }
 }
 
