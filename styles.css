@@ -125,7 +125,7 @@ body {
    Container & Layout
    =================================== */
 .container {
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 3rem 1.5rem;
     min-height: calc(100vh - 80px);
@@ -240,8 +240,9 @@ body {
 }
 
 .prompt-copy-item {
-    flex: 0 0 calc(50% - 0.5rem);
-    max-width: 360px;
+    flex: 1 1 calc(50% - 1rem);
+    min-width: 320px;
+    max-width: calc(50% - 0.5rem);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -250,17 +251,21 @@ body {
 .prompt-copy-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
+    padding: 0.625rem 1rem;
+    width: 100%;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
     border: 1px solid rgba(99, 102, 241, 0.3);
     border-radius: 100px;
     color: var(--color-text);
     font-family: var(--font-family);
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     transition: all var(--transition-normal);
     backdrop-filter: blur(10px);
 }
