@@ -358,6 +358,82 @@
         </section>
     </main>
 
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="faq-container">
+            <h2 class="faq-title">よくある質問</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>完全に無料で使えますか？</span>
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>はい、すべての機能を完全無料でご利用いただけます。処理回数の制限もありません。</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>アップロードしたファイルが外部に漏れる危険性はありませんか？</span>
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>情報漏洩のリスクはゼロです。当アプリはすべてお使いのブラウザ上（完全ローカル環境）で処理を完結させており、外部サーバーへのファイル送信や保存は一切行っていません。</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>スマートフォンでも利用できますか？</span>
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>はい、iPhoneやAndroidのブラウザ（SafariやChrome）からでもインストール不要でそのままご利用いただけます。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "完全に無料で使えますか？",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "はい、すべての機能を完全無料でご利用いただけます。処理回数の制限もありません。"
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "アップロードしたファイルが外部に漏れる危険性はありませんか？",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "情報漏洩のリスクはゼロです。当アプリはすべてお使いのブラウザ上（完全ローカル環境）で処理を完結させており、外部サーバーへのファイル送信や保存は一切行っていません。"
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "スマートフォンでも利用できますか？",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "はい、iPhoneやAndroidのブラウザ（SafariやChrome）からでもインストール不要でそのままご利用いただけます。"
+                }
+            }
+        ]
+    }
+    </script>
+
     <footer class="footer">
         <p>© 2026 ロゴカッター - ブラウザ上で完全に動作</p>
         <p>

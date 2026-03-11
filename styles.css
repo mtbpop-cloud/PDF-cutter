@@ -1340,3 +1340,130 @@ body {
         max-width: 100%;
     }
 }
+
+/* ===================================
+   FAQ Section
+   =================================== */
+.faq-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+}
+
+.faq-container {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    backdrop-filter: blur(20px);
+}
+
+.faq-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+}
+
+.faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color var(--transition-fast);
+}
+
+.faq-item:hover {
+    border-color: rgba(194, 139, 98, 0.3);
+}
+
+.faq-item.active {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 12px rgba(194, 139, 98, 0.1);
+}
+
+.faq-question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-align: left;
+    transition: background var(--transition-fast);
+}
+
+.faq-question:hover {
+    background: rgba(194, 139, 98, 0.04);
+}
+
+.faq-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    transition: transform var(--transition-normal);
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 200px;
+}
+
+.faq-answer p {
+    padding: 0 1.25rem 1.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+@media (max-width: 640px) {
+    .faq-section {
+        padding: 0 1rem 2rem;
+    }
+
+    .faq-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .faq-title {
+        font-size: 1.25rem;
+    }
+
+    .faq-question {
+        font-size: 0.875rem;
+        padding: 0.875rem 1rem;
+    }
+
+    .faq-answer p {
+        font-size: 0.875rem;
+        padding: 0 1rem 1rem;
+    }
+}

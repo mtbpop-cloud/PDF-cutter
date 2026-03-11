@@ -235,6 +235,25 @@ function init() {
     document.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
     document.addEventListener('drop', (e) => { e.preventDefault(); e.stopPropagation(); });
 
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const item = btn.closest('.faq-item');
+            const isActive = item.classList.contains('active');
+            // Close all
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+            // Open clicked if it was closed
+            if (!isActive) {
+                item.classList.add('active');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+            // Update all aria-expanded
+            document.querySelectorAll('.faq-question').forEach(b => {
+                b.setAttribute('aria-expanded', b.closest('.faq-item').classList.contains('active'));
+            });
+        });
+    });
+
     // Prompt copy buttons
     promptCopyBtn.addEventListener('click', () => copyToClipboard(NOTEBOOK_LM_PROMPT));
     geminiPromptCopyBtn.addEventListener('click', () => copyToClipboard(GEMINI_PROMPT));
