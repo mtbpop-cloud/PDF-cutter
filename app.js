@@ -1009,12 +1009,28 @@ async function processFiles() {
     progressFileSize.textContent = '';
     updateProgress(0, '処理を開始...');
 
+    const startTime = Date.now();
+    const MIN_PROCESSING_TIME = 3000; // 3 seconds
+
     try {
         if (mode === 'pdf') {
             await processPDF();
         } else {
             await processImages();
         }
+
+        // Ensure minimum processing time of 3 seconds for better UX
+        const elapsedTime = Date.now() - startTime;
+        if (elapsedTime < MIN_PROCESSING_TIME) {
+            const remainingTime = MIN_PROCESSING_TIME - elapsedTime;
+            updateProgress(90, '最終調整中...');
+            await sleep(remainingTime);
+        }
+
+        updateProgress(100, '完了！');
+        await sleep(300);
+        showResult();
+
     } catch (error) {
         console.error('Processing error:', error);
         showError('ファイルの処理中にエラーが発生しました。');
@@ -1062,10 +1078,6 @@ async function processPDF() {
         // Load for preview
         processedPdfDoc = await pdfjsLib.getDocument({ data: processedPdfBytes.slice() }).promise;
     }
-
-    updateProgress(100, '完了！');
-    await sleep(300);
-    showResult();
 }
 
 async function convertPdfToPng(pdfBytes) {
@@ -1179,10 +1191,6 @@ async function processImages() {
         updateProgress(85, 'PDFを生成中...');
         await createPdfFromCanvases();
     }
-
-    updateProgress(100, '完了！');
-    await sleep(300);
-    showResult();
 }
 
 function cropImageCanvas(img, direction, percentage) {
