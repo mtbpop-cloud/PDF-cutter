@@ -130,6 +130,63 @@ function getImageMimeType(file) {
 }
 
 // ===================================
+// Device & Limits
+// ===================================
+function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+        return 'tablet';
+    }
+    if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+        return 'mobile';
+    }
+    return 'desktop';
+}
+
+function checkFileLimits(type, files, pdfPageCount = null) {
+    const device = getDeviceType();
+    const isMobile = device === 'mobile' || device === 'tablet';
+
+    // Desktop: No strict limits (or set very high limits to prevent completely freezing)
+    if (!isMobile) return true;
+
+    // Mobile/Tablet limits
+    const MAX_PDF_SIZE_MB = 50;
+    const MAX_PDF_PAGES = 100;
+    const MAX_IMAGE_COUNT = 30;
+    const MAX_IMAGES_SIZE_MB = 50;
+
+    if (type === 'pdf') {
+        const file = files[0];
+        const sizeMb = file.size / (1024 * 1024);
+        if (sizeMb > MAX_PDF_SIZE_MB) {
+            showError(`スマートフォン版ではファイルサイズが ${MAX_PDF_SIZE_MB}MB を超えるPDFは処理できません（現在: ${sizeMb.toFixed(1)}MB）。PCからご利用いただくか、ファイルを分割してください。`);
+            return false;
+        }
+        if (pdfPageCount !== null && pdfPageCount > MAX_PDF_PAGES) {
+            showError(`スマートフォン版ではページ数が ${MAX_PDF_PAGES}ページ を超えるPDFは処理できません（現在: ${pdfPageCount}ページ）。PCからご利用いただくか、ファイルを分割してください。`);
+            return false;
+        }
+    } else if (type === 'image') {
+        const totalCount = imageFiles.length + files.length;
+        if (totalCount > MAX_IMAGE_COUNT) {
+            showError(`スマートフォン版では一度に処理できる画像は ${MAX_IMAGE_COUNT}枚 までです（現在: ${totalCount}枚を選択中）。`);
+            return false;
+        }
+        
+        let totalSize = imageFiles.reduce((acc, item) => acc + item.file.size, 0);
+        totalSize += files.reduce((acc, f) => acc + f.size, 0);
+        const totalSizeMb = totalSize / (1024 * 1024);
+        
+        if (totalSizeMb > MAX_IMAGES_SIZE_MB) {
+            showError(`スマートフォン版では合計サイズが ${MAX_IMAGES_SIZE_MB}MB を超える画像は処理できません（現在: ${totalSizeMb.toFixed(1)}MB）。枚数を減らすかPCからご利用ください。`);
+            return false;
+        }
+    }
+    return true;
+}
+
+// ===================================
 // Initialize
 // ===================================
 const promptCopyBtn = document.getElementById('promptCopyBtn');
@@ -569,8 +626,12 @@ async function handleSettingsDrop(e) {
     if (files.length === 0) return;
 
     if (mode === 'image') {
-        // Add dropped images to gallery
         const newImages = files.filter(f => isImage(f));
+        if (newImages.length === 0) return;
+
+        if (!checkFileLimits('image', newImages)) return;
+
+        // Add dropped images to gallery
         for (const file of newImages) {
             const dataUrl = await readFileAsDataUrl(file);
             const img = await loadImage(dataUrl);
@@ -600,6 +661,10 @@ async function loadFiles(files) {
         const firstFile = files[0];
 
         if (isPDF(firstFile)) {
+            if (!checkFileLimits('pdf', [firstFile])) {
+                resetApp();
+                return;
+            }
             mode = 'pdf';
             await loadPDFFile(firstFile);
         } else if (isImage(firstFile)) {
@@ -607,6 +672,10 @@ async function loadFiles(files) {
             const imageFilesOnly = files.filter(f => isImage(f));
             if (imageFilesOnly.length === 0) {
                 showError('有効な画像ファイルが見つかりませんでした。');
+                return;
+            }
+            if (!checkFileLimits('image', imageFilesOnly)) {
+                resetApp();
                 return;
             }
             await loadImageFiles(imageFilesOnly);
@@ -630,6 +699,13 @@ async function loadPDFFile(file) {
         originalPdfBytes = new Uint8Array(arrayBuffer);
         currentPdfDoc = await pdfjsLib.getDocument({ data: originalPdfBytes.slice() }).promise;
         totalPages = currentPdfDoc.numPages;
+        
+        // Second check for PDF pages now that we know them
+        if (!checkFileLimits('pdf', [file], totalPages)) {
+            resetApp();
+            return;
+        }
+
         currentPage = 1;
         pdfFileName = file.name;
 
@@ -741,6 +817,13 @@ function renderGallery() {
 
 async function handleAddImages(e) {
     const files = Array.from(e.target.files).filter(f => isImage(f));
+    if (files.length === 0) return;
+
+    if (!checkFileLimits('image', files)) {
+        addImageInput.value = '';
+        return;
+    }
+
     for (const file of files) {
         const dataUrl = await readFileAsDataUrl(file);
         const img = await loadImage(dataUrl);
