@@ -138,6 +138,10 @@ const geminiIconPromptCopyBtn = document.getElementById('geminiIconPromptCopyBtn
 const geminiInstaPromptCopyBtn = document.getElementById('geminiInstaPromptCopyBtn');
 const rotateLeftBtn = document.getElementById('rotateLeftBtn');
 const rotateRightBtn = document.getElementById('rotateRightBtn');
+const pdfDeleteGroup = document.getElementById('pdfDeleteGroup');
+const deletePageInput = document.getElementById('deletePageInput');
+const deleteSpecificPageBtn = document.getElementById('deleteSpecificPageBtn');
+const deleteCurrentPageBtn = document.getElementById('deleteCurrentPageBtn');
 const toastNotification = document.getElementById('toastNotification');
 
 const NOTEBOOK_LM_PROMPT = `system_instructions:
@@ -259,6 +263,25 @@ function init() {
     // Rotation
     if (rotateLeftBtn) rotateLeftBtn.addEventListener('click', () => rotateCurrentFiles(-90));
     if (rotateRightBtn) rotateRightBtn.addEventListener('click', () => rotateCurrentFiles(90));
+
+    // PDF Page Deletion
+    if (deleteSpecificPageBtn) {
+        deleteSpecificPageBtn.addEventListener('click', () => {
+            const pageNum = parseInt(deletePageInput.value);
+            if (!pageNum || isNaN(pageNum)) {
+                alert('削除するページ番号を入力してください。');
+                return;
+            }
+            deletePdfPage(pageNum);
+        });
+    }
+    if (deleteCurrentPageBtn) {
+        deleteCurrentPageBtn.addEventListener('click', () => {
+            if (confirm(`現在プレビューで表示しているページ (${currentPage}ページ目) を削除しますか？`)) {
+                deletePdfPage(currentPage);
+            }
+        });
+    }
 
     // Prompt copy buttons
     promptCopyBtn.addEventListener('click', () => copyToClipboard(NOTEBOOK_LM_PROMPT));
@@ -431,6 +454,59 @@ async function rotateCurrentFiles(degreesDelta) {
 }
 
 // ===================================
+// PDF Page Deletion
+// ===================================
+async function deletePdfPage(pageNum) {
+    if (mode !== 'pdf' || !currentPdfDoc) return;
+    
+    if (pageNum < 1 || pageNum > totalPages) {
+        alert(`ページ番号は1から${totalPages}の間で指定してください。`);
+        return;
+    }
+
+    if (totalPages <= 1) {
+        alert('最後の1ページは削除できません。');
+        return;
+    }
+
+    // Show temporary feedback
+    const originalCursor = document.body.style.cursor;
+    document.body.style.cursor = 'wait';
+
+    try {
+        // PDFLib uses 0-indexed page numbers for deletion
+        const pdfDoc = await PDFLib.PDFDocument.load(originalPdfBytes.slice());
+        pdfDoc.removePage(pageNum - 1);
+        
+        const savedBytes = await pdfDoc.save();
+        originalPdfBytes = new Uint8Array(savedBytes);
+        
+        // Reload pdfjs document
+        currentPdfDoc = await pdfjsLib.getDocument({ data: originalPdfBytes.slice() }).promise;
+        totalPages = currentPdfDoc.numPages;
+        
+        // Adjust current page if necessary
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        // Update UI
+        deletePageInput.value = '';
+        updatePageNavigation();
+        await renderPreview();
+        
+        // Notify user
+        alert(`${pageNum}ページ目を削除しました。`);
+        
+    } catch (err) {
+        console.error('Page deletion error:', err);
+        alert('ページの削除中にエラーが発生しました。');
+    } finally {
+        document.body.style.cursor = originalCursor;
+    }
+}
+
+// ===================================
 // Prompt Copy
 // ===================================
 async function copyToClipboard(text) {
@@ -559,6 +635,7 @@ async function loadPDFFile(file) {
         fileName.textContent = file.name;
         fileSize.textContent = formatFileSize(file.size);
         pageNav.style.display = '';
+        if (pdfDeleteGroup) pdfDeleteGroup.style.display = 'flex';
 
         showSection('settings');
         await renderPreview();
@@ -586,6 +663,7 @@ async function loadImageFiles(files) {
     fileInfoSingle.hidden = true;
     imageGallery.hidden = false;
     pageNav.style.display = 'none';
+    if (pdfDeleteGroup) pdfDeleteGroup.style.display = 'none';
 
     renderGallery();
     showSection('settings');

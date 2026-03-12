@@ -745,6 +745,85 @@ body {
     color: var(--color-text);
 }
 
+.rotate-delete-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.action-group {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.action-group .settings-label small {
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+    font-weight: normal;
+    margin-left: 4px;
+}
+
+.compact-selector .dir-btn {
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.compact-selector .dir-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.delete-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.delete-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.page-input {
+    width: 60px;
+    padding: 0.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    text-align: center;
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.page-input:focus {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 2px rgba(201, 111, 111, 0.1);
+}
+
+.delete-btn {
+    color: var(--color-error);
+    border-color: rgba(201, 111, 111, 0.3);
+}
+
+.delete-btn:hover {
+    background: rgba(201, 111, 111, 0.1);
+    color: var(--color-error);
+    border-color: var(--color-error);
+}
+
+.delete-btn.outline {
+    font-size: 0.8125rem;
+}
+
 /* ===================================
    Output Format Selector
    =================================== */
