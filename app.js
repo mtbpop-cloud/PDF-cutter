@@ -136,6 +136,8 @@ const promptCopyBtn = document.getElementById('promptCopyBtn');
 const geminiPromptCopyBtn = document.getElementById('geminiPromptCopyBtn');
 const geminiIconPromptCopyBtn = document.getElementById('geminiIconPromptCopyBtn');
 const geminiInstaPromptCopyBtn = document.getElementById('geminiInstaPromptCopyBtn');
+const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+const rotateRightBtn = document.getElementById('rotateRightBtn');
 const toastNotification = document.getElementById('toastNotification');
 
 const NOTEBOOK_LM_PROMPT = `system_instructions:
@@ -253,6 +255,10 @@ function init() {
             });
         });
     });
+
+    // Rotation
+    if (rotateLeftBtn) rotateLeftBtn.addEventListener('click', () => rotateCurrentFiles(-90));
+    if (rotateRightBtn) rotateRightBtn.addEventListener('click', () => rotateCurrentFiles(90));
 
     // Prompt copy buttons
     promptCopyBtn.addEventListener('click', () => copyToClipboard(NOTEBOOK_LM_PROMPT));
@@ -373,8 +379,54 @@ async function handlePaste(e) {
             }
             renderGallery();
             renderPreview();
-            updateCropOverlay();
+            processBtn.disabled = true;
         }
+    }
+}
+
+// ===================================
+// Rotation
+// ===================================
+async function rotateCurrentFiles(degreesDelta) {
+    if (!mode) return;
+
+    // Show temporary feedback
+    const originalCursor = document.body.style.cursor;
+    document.body.style.cursor = 'wait';
+
+    try {
+        if (mode === 'pdf' && currentPdfDoc) {
+            const pages = currentPdfDoc.getPages();
+            pages.forEach(p => {
+                const r = p.getRotation().angle || 0;
+                p.setRotation(PDFLib.degrees(r + degreesDelta));
+            });
+            const savedBytes = await currentPdfDoc.save();
+            originalPdfBytes = new Uint8Array(savedBytes);
+            await renderPreview();
+        } else if (mode === 'image' && imageFiles.length > 0) {
+            for (const item of imageFiles) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const is90 = Math.abs(degreesDelta) === 90 || Math.abs(degreesDelta) === 270;
+                
+                canvas.width = is90 ? item.img.height : item.img.width;
+                canvas.height = is90 ? item.img.width : item.img.height;
+                
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(degreesDelta * Math.PI / 180);
+                ctx.drawImage(item.img, -item.img.width / 2, -item.img.height / 2);
+                
+                item.dataUrl = canvas.toDataURL(item.file.type || 'image/png');
+                item.img = await loadImage(item.dataUrl);
+            }
+            renderGallery();
+            renderPreview();
+        }
+    } catch (err) {
+        console.error('Rotation error:', err);
+    } finally {
+        document.body.style.cursor = originalCursor;
     }
 }
 
@@ -871,22 +923,55 @@ async function convertPdfToPng(pdfBytes) {
     }
 }
 
-function cropPageBottom(page, percentage) {
-    const { width, height } = page.getSize();
-    const cropHeight = height * (percentage / 100);
-    const newHeight = height - cropHeight;
+function applyCropToPage(page, visualDirection, percentage) {
+    let rotation = (page.getRotation().angle || 0) % 360;
+    if (rotation < 0) rotation += 360;
+
+    let actualDirection;
+    if (visualDirection === 'bottom') {
+        if (rotation === 0) actualDirection = 'bottom';
+        else if (rotation === 90) actualDirection = 'right';
+        else if (rotation === 180) actualDirection = 'top';
+        else if (rotation === 270) actualDirection = 'left';
+    } else { // top
+        if (rotation === 0) actualDirection = 'top';
+        else if (rotation === 90) actualDirection = 'left';
+        else if (rotation === 180) actualDirection = 'bottom';
+        else if (rotation === 270) actualDirection = 'right';
+    }
+
     const mediaBox = page.getMediaBox();
-    page.setCropBox(mediaBox.x, mediaBox.y + cropHeight, mediaBox.width, newHeight);
-    page.setMediaBox(mediaBox.x, mediaBox.y + cropHeight, mediaBox.width, newHeight);
+    let newX = mediaBox.x;
+    let newY = mediaBox.y;
+    let newW = mediaBox.width;
+    let newH = mediaBox.height;
+
+    if (actualDirection === 'bottom') {
+        const crop = mediaBox.height * (percentage / 100);
+        newY = mediaBox.y + crop;
+        newH = mediaBox.height - crop;
+    } else if (actualDirection === 'top') {
+        const crop = mediaBox.height * (percentage / 100);
+        newH = mediaBox.height - crop;
+    } else if (actualDirection === 'left') {
+        const crop = mediaBox.width * (percentage / 100);
+        newX = mediaBox.x + crop;
+        newW = mediaBox.width - crop;
+    } else if (actualDirection === 'right') {
+        const crop = mediaBox.width * (percentage / 100);
+        newW = mediaBox.width - crop;
+    }
+
+    page.setCropBox(newX, newY, newW, newH);
+    page.setMediaBox(newX, newY, newW, newH);
+}
+
+function cropPageBottom(page, percentage) {
+    applyCropToPage(page, 'bottom', percentage);
 }
 
 function cropPageTop(page, percentage) {
-    const { width, height } = page.getSize();
-    const cropHeight = height * (percentage / 100);
-    const newHeight = height - cropHeight;
-    const mediaBox = page.getMediaBox();
-    page.setCropBox(mediaBox.x, mediaBox.y, mediaBox.width, newHeight);
-    page.setMediaBox(mediaBox.x, mediaBox.y, mediaBox.width, newHeight);
+    applyCropToPage(page, 'top', percentage);
 }
 
 // ===================================
