@@ -492,6 +492,10 @@ async function deletePdfPage(pageNum) {
 
         // Update UI
         deletePageInput.value = '';
+        if (deletePageInput) {
+            deletePageInput.max = totalPages;
+            deletePageInput.placeholder = `1 - ${totalPages}`;
+        }
         updatePageNavigation();
         await renderPreview();
         
@@ -635,7 +639,13 @@ async function loadPDFFile(file) {
         fileName.textContent = file.name;
         fileSize.textContent = formatFileSize(file.size);
         pageNav.style.display = '';
-        if (pdfDeleteGroup) pdfDeleteGroup.style.display = 'flex';
+        if (pdfDeleteGroup) {
+            pdfDeleteGroup.style.display = 'flex';
+            if (deletePageInput) {
+                deletePageInput.max = totalPages;
+                deletePageInput.placeholder = `1 - ${totalPages}`;
+            }
+        }
 
         showSection('settings');
         await renderPreview();
